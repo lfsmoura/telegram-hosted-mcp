@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Success - Telegram Connected{% endblock %}
+
+{% block content %}
+<div class="logo">
+    <svg viewBox="0 0 24 24" fill="#4caf50">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    </svg>
+</div>
+
+<h1>Successfully Connected!</h1>
+<p class="subtitle">Your Telegram account is now connected to Claude. You can close this window.</p>
+
+<div class="steps">
+    <div class="step completed"></div>
+    <div class="step completed"></div>
+    <div class="step completed"></div>
+</div>
+
+<p style="text-align: center; color: #666; margin-top: 20px;">
+    Redirecting you back to Claude...
+</p>
+{% endblock %}
