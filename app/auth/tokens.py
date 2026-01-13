@@ -32,13 +32,9 @@ def create_refresh_token(
     expires_delta: timedelta | None = None,
 ) -> str:
     """Create a refresh token for the given user."""
-    if expires_delta is None:
-        expires_delta = timedelta(days=settings.refresh_token_expire_days)
-
-    expire = datetime.utcnow() + expires_delta
+    # No expiry - tokens last forever (until Telegram session is revoked)
     to_encode = {
         "sub": claude_user_id,
-        "exp": expire,
         "iat": datetime.utcnow(),
         "type": "refresh",
         "jti": secrets.token_urlsafe(16),
@@ -53,7 +49,10 @@ def verify_access_token(token: str) -> dict | None:
     """
     try:
         payload = jwt.decode(
-            token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+            token,
+            settings.jwt_secret,
+            algorithms=[settings.jwt_algorithm],
+            options={"verify_exp": False},  # No expiry check
         )
         if payload.get("type") != "access":
             return None
@@ -69,7 +68,10 @@ def verify_refresh_token(token: str) -> dict | None:
     """
     try:
         payload = jwt.decode(
-            token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+            token,
+            settings.jwt_secret,
+            algorithms=[settings.jwt_algorithm],
+            options={"verify_exp": False},  # No expiry check
         )
         if payload.get("type") != "refresh":
             return None
