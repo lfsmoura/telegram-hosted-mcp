@@ -76,7 +76,23 @@ app.include_router(oauth_router, tags=["OAuth"])
 # Include Telegram auth routes
 app.include_router(telegram_auth_router, prefix="/auth", tags=["Telegram Auth"])
 
-# Mount MCP server
+
+# OAuth Protected Resource Metadata (RFC 9728)
+# Claude looks for this to discover the authorization server
+@app.get("/.well-known/oauth-protected-resource")
+@app.get("/.well-known/oauth-protected-resource/{path:path}")
+async def oauth_protected_resource(path: str = ""):
+    """OAuth 2.0 Protected Resource Metadata."""
+    return {
+        "resource": settings.base_url,
+        "authorization_servers": [settings.base_url],
+        "scopes_supported": ["telegram:read", "telegram:write", "telegram:admin"],
+        "bearer_methods_supported": ["header"],
+    }
+
+
+# Mount MCP server at both /mcp and /mcp/ to avoid redirects
+app.mount("/mcp/", mcp_app)
 app.mount("/mcp", mcp_app)
 
 
