@@ -1064,6 +1064,7 @@ dependencies = [
     { name = "python-jose", extra = ["cryptography"] },
     { name = "python-multipart" },
     { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "telegram-mcp" },
     { name = "telethon" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -1092,10 +1093,24 @@ requires-dist = [
     { name = "python-multipart", specifier = ">=0.0.18" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.0" },
+    { name = "telegram-mcp", specifier = ">=0.5.4" },
     { name = "telethon", specifier = ">=1.37.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32.0" },
 ]
 provides-extras = ["dev"]
+
+[[package]]
+name = "telegram-mcp"
+version = "0.5.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "mcp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a0/6b/b772babef81657cbe5995808c52c62abd231653da633557302704d27bf3f/telegram_mcp-0.5.4.tar.gz", hash = "sha256:85e100db047818798178228b98556eee7f45334550230abb7ba5c4ac921a976c", size = 4373, upload-time = "2026-01-12T12:22:11.881Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ab/c6/7ecb5f5a709a2bfb432167c3823643d3a768ff957da22c3ab7df21d98406/telegram_mcp-0.5.4-py3-none-any.whl", hash = "sha256:d6f7609885991ad0e1779c1729c80ea9eaec672af6808e5bd4e14833fbd86bb7", size = 5268, upload-time = "2026-01-12T12:22:11.038Z" },
+]
 
 [[package]]
 name = "telethon"

@@ -12,7 +12,7 @@ from app.auth.oauth import router as oauth_router
 from app.auth.telegram_auth import router as telegram_auth_router
 from app.config import get_settings
 from app.database import init_db
-from app.mcp.server import mcp_app
+from app.mcp.server import handle_mcp_request_direct
 from app.telegram.client_pool import client_pool
 
 # Configure logging
@@ -91,9 +91,12 @@ async def oauth_protected_resource(path: str = ""):
     }
 
 
-# Mount MCP server at both /mcp and /mcp/ to avoid redirects
-app.mount("/mcp/", mcp_app)
-app.mount("/mcp", mcp_app)
+# MCP endpoint - handle both with and without trailing slash
+@app.post("/mcp")
+@app.post("/mcp/")
+async def mcp_endpoint(request: Request):
+    """Handle MCP JSON-RPC requests."""
+    return await handle_mcp_request_direct(request)
 
 
 @app.get("/")
