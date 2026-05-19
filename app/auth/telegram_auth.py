@@ -23,7 +23,6 @@ from app.auth.tokens import generate_authorization_code
 from app.config import get_settings
 from app.database import get_db
 from app.models.oauth import OAuthCode
-from app.models.session import TelegramSession
 from app.telegram.session_store import SessionStore
 
 router = APIRouter()
@@ -295,17 +294,10 @@ async def _complete_auth(
     me = await client.get_me()
     claude_user_id = f"tg_{me.id}"
 
-    # Encrypt and store session
+    # Encrypt and store session. This updates/reactivates an existing row if the
+    # user reconnects after revoking their previous local session.
     session_store = SessionStore(db)
-    encrypted_session = session_store.encrypt(session_string)
-
-    # Create or update session record
-    telegram_session = TelegramSession(
-        claude_user_id=claude_user_id,
-        phone_hash=_hash_phone(phone),
-        session_data=encrypted_session,
-    )
-    db.add(telegram_session)
+    await session_store.save_session(claude_user_id, session_string, _hash_phone(phone))
 
     # Generate authorization code
     auth_code = generate_authorization_code()

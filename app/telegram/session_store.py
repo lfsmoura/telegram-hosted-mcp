@@ -42,6 +42,13 @@ class SessionStore:
         )
         return result.scalar_one_or_none()
 
+    async def get_any_session(self, claude_user_id: str) -> TelegramSession | None:
+        """Get a session for a user, including inactive sessions."""
+        result = await self.db.execute(
+            select(TelegramSession).where(TelegramSession.claude_user_id == claude_user_id)
+        )
+        return result.scalar_one_or_none()
+
     async def get_session_string(self, claude_user_id: str) -> str | None:
         """Get the decrypted session string for a user.
 
@@ -64,24 +71,24 @@ class SessionStore:
         """
         encrypted = self.encrypt(session_string)
 
-        # Check for existing session
-        existing = await self.get_session(claude_user_id)
+        # Check for any existing session, including inactive rows. claude_user_id is
+        # unique, so reconnecting after a soft-delete must update/reactivate it.
+        existing = await self.get_any_session(claude_user_id)
         if existing:
-            # Update existing session
             existing.session_data = encrypted
             existing.phone_hash = phone_hash
+            existing.is_active = True
             await self.db.commit()
             return existing
-        else:
-            # Create new session
-            session = TelegramSession(
-                claude_user_id=claude_user_id,
-                phone_hash=phone_hash,
-                session_data=encrypted,
-            )
-            self.db.add(session)
-            await self.db.commit()
-            return session
+
+        session = TelegramSession(
+            claude_user_id=claude_user_id,
+            phone_hash=phone_hash,
+            session_data=encrypted,
+        )
+        self.db.add(session)
+        await self.db.commit()
+        return session
 
     async def delete_session(self, claude_user_id: str) -> bool:
         """Soft-delete a session by marking it inactive.
